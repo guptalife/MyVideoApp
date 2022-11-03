@@ -11,10 +11,9 @@ const getSocketServer = (server) => {
     io.on('connection', (socket) => {
         console.log(socket.id);
         console.log(socket.rooms);
-        const ROOM_ID = 400;
-        socket.on('join-call', () => {
-            socket.join(ROOM_ID);
-            socket.to(ROOM_ID).emit('call-request', socket.id);
+        socket.on('join-call', (roomId) => {
+            socket.join(roomId);
+            socket.to(roomId).emit('call-request', socket.id);
         })
         socket.on('call-accepted', ({ from, to, data }) => {
             console.log('call - accept');
@@ -25,7 +24,14 @@ const getSocketServer = (server) => {
         })
         socket.on('disconnecting', () => {
             console.log('disconnected');
-            socket.to(ROOM_ID).emit('participant-left', socket.id);
+            socket.rooms.forEach((roomId)=>{
+                 socket.to(roomId).emit('participant-left', socket.id);
+            })
+        })
+        socket.on('leave-call',()=>{
+            socket.rooms.forEach((roomId)=>{
+                socket.to(roomId).emit('participant-left', socket.id);
+           })
         })
     })
 }

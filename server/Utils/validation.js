@@ -35,6 +35,7 @@ module.exports.validateLoginCredentials=(req,res,next)=>{
 
 
 module.exports.validateRegisterCredentials=async(req,res,next)=>{
+    console.log('request came')
     const body=req.body;
     if(registerSchema.validate(body).error){
           return res.status(401).json({

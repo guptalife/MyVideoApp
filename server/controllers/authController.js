@@ -2,6 +2,7 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const genrateToken = require('../Utils/genrateToken');
 const register = async (req, res) => {
+    console.log(' register came')
     try {
         const { email, username, password } = req.body;
         const userExist = await User.exists({ email });
@@ -25,7 +26,7 @@ const register = async (req, res) => {
         } else {
             return res.status(401).json({
                 error: true,
-                message: 'User Already Exists'
+                message: 'Email Already Exists'
             })
         }
     } catch (err) {
@@ -38,7 +39,9 @@ const register = async (req, res) => {
 }
 const login = async (req, res) => {
     try {
-        const { username, password, email } = req.body;
+        console.log('login came');
+        const {password, email } = req.body;
+        console.log(email+password);
         const userFound = await User.findOne({ email });
         if (userFound && await bcrypt.compare(password, userFound.password)) {
             const token = genrateToken(
@@ -47,8 +50,8 @@ const login = async (req, res) => {
                 });
             return res.status(201).json({
                 email,
-                username,
-                token
+                token,
+                username:userFound.username
             })
         } else {
             return res.status(400).json({
@@ -58,6 +61,7 @@ const login = async (req, res) => {
         }
     }
     catch (err) {
+        console.log(err);
         return res.status(400).json({
             error: true,
             Exception: err
